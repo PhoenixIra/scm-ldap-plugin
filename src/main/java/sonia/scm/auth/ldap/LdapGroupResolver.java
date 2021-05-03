@@ -138,6 +138,7 @@ public class LdapGroupResolver implements GroupResolver {
 
     LdapConfig config = store.get();
     String groupAttribute = config.getAttributeNameGroup();
+    String searchDN = LdapUtil.createDN(config, config.getUnitGroup());
 
     if (Util.isNotEmpty(groupAttribute)) {
       LOG.trace("try to get groups from group attribute {}", groupAttribute);
@@ -150,9 +151,10 @@ public class LdapGroupResolver implements GroupResolver {
 
           while (userGroupsEnm.hasMore()) {
             String group = (String) userGroupsEnm.next();
-
-            LOG.debug("append group {} to user result", group);
-            groups.add(group);
+            if(group.endsWith(searchDN)){
+              LOG.debug("append group {} to user result", group);
+              groups.add(group);
+            }
           }
         } else {
           LOG.debug("user has no group attributes assigned");
